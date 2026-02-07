@@ -1,0 +1,194 @@
+﻿@model IEnumerable<Reservation_Management_App.Domain.DomainModels.Reservation>
+@{
+    ViewData["Title"] = "Reservations";
+    var events = ViewBag.Events as List<Reservation_Management_App.Domain.DomainModels.Event>;
+    var selectedEventId = ViewBag.SelectedEventId as Guid?;
+}
+
+<!-- Page Header with Filter -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1>
+                <i class="bi bi-ticket-perforated" style="color: #eab308;"></i> Reservations
+                @{
+                    var pendingCount = Model.Count(r => r.Status == Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Pending);
+                    if (pendingCount > 0)
+                    {
+                        <span class="badge" style="background: #eab308; color: #000; font-size: 0.9rem; vertical-align: middle;">@pendingCount pending</span>
+                    }
+                }
+            </h1>
+            <p style="color: #a0a0a0;">Approve or reject reservation requests</p>
+        </div>
+
+        <!-- Event Filter Dropdown -->
+        <div class="card" style="min-width: 300px; background: #1a1a1a; border: 1px solid #2a2a2a;">
+            <div class="card-body p-3">
+                <form asp-action="Index" method="get" id="filterForm">
+                    <label class="control-label mb-2" style="color: #a0a0a0; font-size: 0.9rem;">
+                        <i class="bi bi-funnel me-2"></i>Filter by Event
+                    </label>
+                    <select name="eventId" class="form-select" onchange="document.getElementById('filterForm').submit();">
+                        <option value="">All Events (@Model.Count() reservations)</option>
+                        @if (events != null && events.Any())
+                        {
+                            @foreach (var ev in events.OrderBy(e => e.StartDateTime))
+                            {
+                                var reservationCount = Model.Count(r => r.EventId == ev.Id);
+                                <option value="@ev.Id" selected="@(selectedEventId == ev.Id)">
+                                    @ev.Title (@reservationCount)
+                                </option>
+                            }
+                        }
+                    </select>
+                    @if (selectedEventId.HasValue && selectedEventId.Value != Guid.Empty)
+                    {
+                        <a asp-action="Index" class="btn btn-sm btn-secondary w-100 mt-2">
+                            <i class="bi bi-x-lg me-2"></i>Clear Filter
+                        </a>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        @if (selectedEventId.HasValue)
+        {
+            <span>No reservations for this event.</span>
+        }
+        else
+        {
+            <span>No reservations yet.</span>
+        }
+    </div>
+}
+else
+{
+    <!-- Reservations Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Reservation</th>
+                        <th>People</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        var img = string.IsNullOrWhiteSpace(r.Event?.PosterImageUrl)
+                        ? "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=100&h=100&fit=crop"
+                        : r.Event.PosterImageUrl;
+
+                        var isPending = r.Status == Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Pending;
+                        var isApproved = r.Status == Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Approved;
+                        var isRejected = r.Status == Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Rejected;
+
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@img" alt="@r.Event?.Title"
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                                    <div>
+                                        <div style="font-weight: 600; color: white;">@(r.Event?.Title ?? "Unknown Event")</div>
+                                        <div style="font-size: 0.85rem; color: #6b7280;">
+                                            @(r.Event?.StartDateTime.ToString("dd/MM/yyyy") ?? "")
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <div style="color: white; font-weight: 600;">@r.ReservationName</div>
+                            </td>
+                            <td style="vertical-align: middle; color: white; font-weight: 600;">
+                                @r.NumberOfPeople
+                            </td>
+                            <td style="vertical-align: middle; color: #a0a0a0;">
+                                @r.PhoneNumber
+                            </td>
+                            <td style="vertical-align: middle;">
+                                @if (isApproved)
+                                {
+                                    <span class="badge" style="background: #10b981; color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem;">
+                                        <i class="bi bi-check-circle me-1"></i>Approved
+                                    </span>
+                                }
+                                else if (isPending)
+                                {
+                                    <span class="badge" style="background: #eab308; color: #000; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem;">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </span>
+                                }
+                                else if (isRejected)
+                                {
+                                    <span class="badge" style="background: #ef4444; color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem;">
+                                        <i class="bi bi-x-circle me-1"></i>Rejected
+                                    </span>
+                                }
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <div class="d-flex gap-2">
+                                    @if (!isApproved)
+                                    {
+                                        <!-- Show Approve button if NOT already approved -->
+                                        <form asp-action="Approve" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <button type="submit" class="btn btn-sm btn-link p-1" style="color: #10b981;" title="Approve">
+                                                <i class="bi bi-check-lg" style="font-size: 1.25rem;"></i>
+                                            </button>
+                                        </form>
+                                    }
+
+                                    @if (!isRejected)
+                                    {
+                                        <!-- Show Reject button if NOT already rejected -->
+                                        <form asp-action="Reject" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <button type="submit" class="btn btn-sm btn-link p-1" style="color: #ef4444;" title="Reject">
+                                                <i class="bi bi-x-lg" style="font-size: 1.25rem;"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<style>
+    .btn-link:hover {
+        transform: scale(1.2);
+        transition: transform 0.2s ease;
+    }
+</style>

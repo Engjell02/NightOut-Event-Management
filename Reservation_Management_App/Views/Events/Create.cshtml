@@ -1,0 +1,130 @@
+﻿@model Reservation_Management_App.Domain.DomainModels.Event
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Events
+        </a>
+    </div>
+    <h1><i class="bi bi-calendar-plus" style="color: #d946ef;"></i> Create New Event</h1>
+    <p style="color: #a0a0a0;">Add a new party, concert, or club night</p>
+</div>
+
+<!-- Create Form Card -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Event Name -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Title" class="control-label">Event Name</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g., Neon Nights, Rock Revolution" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <!-- Location Dropdown -->
+                    <div class="form-group mb-4">
+                        <label asp-for="LocationId" class="control-label">Location / Venue</label>
+                        <select asp-for="LocationId" class="form-select" asp-items="ViewBag.LocationId">
+                            <option value="">-- Select a venue --</option>
+                        </select>
+                        <span asp-validation-for="LocationId" class="text-danger"></span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Don't see your venue? <a asp-controller="Locations" asp-action="Create" target="_blank" style="color: #d946ef;">Add a new location</a>
+                        </small>
+                    </div>
+
+                    <!-- Date & Time Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="StartDateTime" class="control-label">Date & Time</label>
+                                <input asp-for="StartDateTime" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="StartDateTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="PricePerPerson" class="control-label">Entry Price (ден)</label>
+                                <input asp-for="PricePerPerson" type="number" step="0.01" class="form-control" placeholder="25" />
+                                <span asp-validation-for="PricePerPerson" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Spots -->
+                    <div class="form-group mb-4">
+                        <label asp-for="AvailableSpots" class="control-label">Available Tables</label>
+                        <input asp-for="AvailableSpots" type="number" class="form-control" placeholder="20" />
+                        <span asp-validation-for="AvailableSpots" class="text-danger"></span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Number of tables/reservations available for booking
+                        </small>
+                    </div>
+
+                    <!-- Poster Image URL -->
+                    <div class="form-group mb-4">
+                        <label asp-for="PosterImageUrl" class="control-label">Poster Image URL</label>
+                        <input asp-for="PosterImageUrl" class="form-control" placeholder="https://example.com/image.jpg" />
+                        <span asp-validation-for="PosterImageUrl" class="text-danger"></span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Direct link to event poster/flyer image
+                        </small>
+                    </div>
+
+                    <!-- Performers Section -->
+                    <div class="p-3 mb-4" style="background: rgba(217, 70, 239, 0.05); border: 1px solid #2a2a2a; border-radius: 12px;">
+                        <h5 class="mb-3" style="color: #d946ef;">
+                            <i class="bi bi-music-note-beamed me-2"></i>Performers
+                        </h5>
+
+                        <!-- Main Act Dropdown -->
+                        <div class="form-group mb-3">
+                            <label asp-for="MainActId" class="control-label">Main Act (Band/Singer)</label>
+                            <select asp-for="MainActId" class="form-select" asp-items="ViewBag.MainActId">
+                                <option value="">-- Select band or singer --</option>
+                            </select>
+                            <span asp-validation-for="MainActId" class="text-danger"></span>
+                        </div>
+
+                        <!-- DJ Dropdown -->
+                        <div class="form-group mb-0">
+                            <label asp-for="DjId" class="control-label">DJ</label>
+                            <select asp-for="DjId" class="form-select" asp-items="ViewBag.DjId">
+                                <option value="">-- Select DJ --</option>
+                            </select>
+                            <span asp-validation-for="DjId" class="text-danger"></span>
+                        </div>
+
+                        <small class="form-text d-block mt-2" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Don't see your performer? <a asp-controller="Performers" asp-action="Create" target="_blank" style="color: #d946ef;">Add a new performer</a>
+                        </small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <a asp-action="Index" class="btn btn-secondary flex-grow-1">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-check-lg me-2"></i>Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

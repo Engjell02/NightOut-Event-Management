@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Reserve Your Table";
+    var eventId = (Guid)ViewBag.EventId;
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <a asp-controller="Events" asp-action="Details" asp-route-id="@eventId" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Event
+        </a>
+    </div>
+    <h1><i class="bi bi-ticket-perforated" style="color: #d946ef;"></i> Reserve Your Table</h1>
+    <p style="color: #a0a0a0;">Fill in your details below (group size: 2-6 people)</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-4">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<!-- Reserve Form Card -->
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Reserve" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="eventId" value="@eventId" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Reservation Name -->
+                    <div class="form-group mb-4">
+                        <label class="control-label">Reservation Name</label>
+                        <input class="form-control" name="reservationName" placeholder="e.g., John's Party" required />
+                        <span class="text-danger small">@Html.ValidationMessage("reservationName")</span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Name for your reservation
+                        </small>
+                    </div>
+
+                    <!-- Number of People -->
+                    <div class="form-group mb-4">
+                        <label class="control-label">Number of People (2-6)</label>
+                        <input class="form-control" type="number" name="numberOfPeople" min="2" max="6" value="2" required />
+                        <span class="text-danger small">@Html.ValidationMessage("numberOfPeople")</span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-people me-1"></i>Group size must be between 2 and 6 people
+                        </small>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group mb-4">
+                        <label class="control-label">Phone Number</label>
+                        <input class="form-control" name="phoneNumber" type="tel" placeholder="+389 XX XXX XXX" required />
+                        <span class="text-danger small">@Html.ValidationMessage("phoneNumber")</span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-telephone me-1"></i>We'll contact you for confirmation
+                        </small>
+                    </div>
+
+                    <!-- Warning Box -->
+                    <div class="alert" style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); color: #eab308;">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Cancellation Policy:</strong> You can cancel only if it's at least <strong>24 hours before</strong> the event starts.
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@eventId" class="btn btn-secondary flex-grow-1">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-check-lg me-2"></i>Confirm Reservation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

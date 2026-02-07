@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Reservation_Management_App.Domain/Reservation_Management_App.Domain.csproj" />
+  <Project Path="Reservation_Management_App.Repository/Reservation_Management_App.Repository.csproj" />
+  <Project Path="Reservation_Management_App.Service/Reservation_Management_App.Service.csproj" />
+  <Project Path="Reservation_Management_App.Tests/Reservation_Management_App.Tests.csproj" Id="76f571b3-2ad7-49e4-9358-98d9fa605333" />
+  <Project Path="Reservation_Management_App/Reservation_Management_App.Web.csproj" />
+</Solution>

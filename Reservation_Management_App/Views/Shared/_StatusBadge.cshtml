@@ -1,0 +1,15 @@
+﻿@model Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus
+
+@{
+    var text = Model.ToString();
+    var css = Model switch
+    {
+        Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Pending => "bg-warning text-dark",
+        Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Approved => "bg-success",
+        Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Rejected => "bg-danger",
+        Reservation_Management_App.Domain.DomainModels.Enums.ReservationStatus.Cancelled => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+}
+
+<span class="badge rounded-pill @css px-3 py-2">@text</span>

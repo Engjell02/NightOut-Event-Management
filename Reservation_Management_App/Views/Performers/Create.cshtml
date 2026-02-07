@@ -1,0 +1,76 @@
+﻿@model Reservation_Management_App.Domain.DomainModels.Performer
+@{
+    ViewData["Title"] = "Add Performer";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Performers
+        </a>
+    </div>
+    <h1><i class="bi bi-person-plus-fill" style="color: #10b981;"></i> Add New Performer</h1>
+    <p style="color: #a0a0a0;">Create a new DJ, band, or singer profile</p>
+</div>
+
+<!-- Create Form Card -->
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Performer Name -->
+                    <div class="form-group mb-4">
+                        <label asp-for="StageName" class="control-label">Performer Name</label>
+                        <input asp-for="StageName" class="form-control" placeholder="e.g., DJ Pulse" />
+                        <span asp-validation-for="StageName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Type Dropdown -->
+                    <div class="form-group mb-4">
+                        <label asp-for="Type" class="control-label">Type</label>
+                        <select asp-for="Type" class="form-select">
+                            <option value="">-- Select type --</option>
+                            <option value="DJ">DJ</option>
+                            <option value="Band">Band</option>
+                            <option value="Singer">Singer</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Choose the performer type
+                        </small>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="form-group mb-4">
+                        <label asp-for="ImageUrl" class="control-label">Image URL</label>
+                        <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/performer.jpg" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <small class="form-text" style="color: #6b7280;">
+                            <i class="bi bi-info-circle me-1"></i>Direct link to performer photo
+                        </small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <a asp-action="Index" class="btn btn-secondary flex-grow-1">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-check-lg me-2"></i>Add Performer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

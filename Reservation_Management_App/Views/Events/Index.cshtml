@@ -1,0 +1,397 @@
+﻿@model IEnumerable<Reservation_Management_App.Domain.DomainModels.Event>
+
+@{
+    ViewData["Title"] = "Events";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+@if (isAdmin)
+{
+    <!-- ADMIN TABLE VIEW -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>
+                    <i class="bi bi-calendar-event" style="color: #d946ef;"></i> Events
+                </h1>
+                <p style="color: #a0a0a0;">Manage all events</p>
+            </div>
+            <a class="btn btn-primary" asp-action="Create">
+                <i class="bi bi-plus-lg me-2"></i>Create Event
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>No events yet. Create one to get started.
+        </div>
+    }
+    else
+    {
+        <!-- Admin Events Table -->
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th>Tables</th>
+                            <th>People</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model)
+                        {
+                            var img = string.IsNullOrWhiteSpace(e.PosterImageUrl)
+                            ? "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=100&q=80"
+                            : e.PosterImageUrl;
+
+                            var approvedPeopleDict = ViewBag.ApprovedPeopleByEvent as Dictionary<Guid, int>;
+                            var approvedPeopleCount = approvedPeopleDict != null && approvedPeopleDict.ContainsKey(e.Id)
+                            ? approvedPeopleDict[e.Id]
+                            : 0;
+
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="@img" alt="@e.Title"
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                                        <div>
+                                            <div style="font-weight: 600; color: white;">
+                                                @e.Title
+                                                @if (e.ImportedFromApi)
+                                                {
+                                                    <span class="badge ms-2" style="background: rgba(99, 102, 241, 0.2); color: #6366f1; font-size: 0.7rem; padding: 0.3rem 0.6rem;">
+                                                        <i class="bi bi-cloud-download me-1"></i>From API
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="vertical-align: middle; color: #a0a0a0;">
+                                    @(e.Location?.Name ?? "Unknown")
+                                </td>
+                                <td style="vertical-align: middle; color: #a0a0a0;">
+                                    @e.StartDateTime.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span style="color: #f97316; font-weight: 700;">@e.PricePerPerson.ToString("0") ден</span>
+                                </td>
+                                <td style="vertical-align: middle; color: white; font-weight: 600;">
+                                    @e.AvailableSpots
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    @if (approvedPeopleCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-people-fill" style="color: #10b981; font-size: 1.1rem;"></i>
+                                            <span style="color: #10b981; font-weight: 600;">@approvedPeopleCount</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #6b7280;">0</span>
+                                    }
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-link p-1" style="color: #d946ef;">
+                                            <i class="bi bi-pencil" style="font-size: 1.1rem;"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-link p-1" style="color: #ef4444;">
+                                            <i class="bi bi-trash" style="font-size: 1.1rem;"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <!-- USER CARD VIEW (Your existing code) -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>
+                    <i class="bi bi-stars" style="color: #d946ef;"></i> Upcoming Events
+                </h1>
+                <p style="color: #a0a0a0;">Discover the hottest parties and events in town. Reserve your table now!</p>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>No events yet. Check back soon!
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var e in Model)
+            {
+                var img = string.IsNullOrWhiteSpace(e.PosterImageUrl)
+                ? "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
+                : e.PosterImageUrl;
+
+                var soldOut = e.AvailableSpots <= 0;
+
+                var locationType = e.Location?.Name?.ToLower().Contains("club") == true ? "CLUB" :
+                e.Location?.Name?.ToLower().Contains("arena") == true || e.Location?.Name?.ToLower().Contains("concert") == true ? "CONCERT HALL" :
+                e.Location?.Name?.ToLower().Contains("bar") == true || e.Location?.Name?.ToLower().Contains("lounge") == true ? "BAR" :
+                "VENUE";
+
+                var locationBadgeClass = locationType == "CLUB" ? "badge-club" :
+                locationType == "CONCERT HALL" ? "badge-concert" :
+                locationType == "BAR" ? "badge-bar" : "badge-venue";
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card event-card h-100">
+
+                        <div class="position-relative event-image-container">
+                            <img src="@img" class="event-image" alt="@e.Title" />
+
+                            <!-- Location Type Badge (Top Left) - MOVED HERE -->
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge @locationBadgeClass">@locationType</span>
+                            </div>
+
+                            <!-- Price Badge (Top Right) -->
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <div class="price-badge">@e.PricePerPerson.ToString("0") ден</div>
+                            </div>
+
+                            <!-- Event Title (Bottom Left) - ONLY TITLE NOW -->
+                            <div class="position-absolute bottom-0 start-0 end-0 p-3"
+                                 style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));">
+                                <h5 class="text-white fw-bold mb-1">@e.Title</h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-3 d-flex align-items-center" style="color: #a0a0a0;">
+                                <i class="bi bi-geo-alt-fill me-2" style="color: #d946ef;"></i>
+                                <span>@(e.Location?.Name ?? "Unknown venue")</span>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="info-box">
+                                        <i class="bi bi-calendar-event" style="color: #d946ef;"></i>
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #6b7280;">Date</div>
+                                            <div style="font-weight: 600;">@e.StartDateTime.ToString("MMM dd, yyyy")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-box">
+                                        <i class="bi bi-clock" style="color: #d946ef;"></i>
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #6b7280;">Doors Open</div>
+                                            <div style="font-weight: 600;">@e.StartDateTime.ToString("HH:mm")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-box mb-3">
+                                <i class="bi bi-people-fill" style="color: @(soldOut ? "#ef4444" : "#10b981");"></i>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #6b7280;">Available</div>
+                                    <div style="font-weight: 600; color: @(soldOut ? "#ef4444" : "#10b981");">
+                                        @(soldOut ? "Sold Out" : $"{e.AvailableSpots} tables")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="performers-section">
+                                <div class="performer-item">
+                                    <i class="bi bi-music-note-beamed" style="color: #ec4899;"></i>
+                                    <span class="performer-label">Main act:</span>
+                                    <span class="performer-name">@(e.MainAct?.StageName ?? "-")</span>
+                                </div>
+                                <div class="performer-item">
+                                    <i class="bi bi-disc" style="color: #8b5cf6;"></i>
+                                    <span class="performer-label">DJ:</span>
+                                    <span class="performer-name">@(e.Dj?.StageName ?? "-")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer" style="background: transparent; border-top: 1px solid #2a2a2a; padding: 1rem;">
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-secondary flex-grow-1" asp-action="Details" asp-route-id="@e.Id">
+                                    <i class="bi bi-eye me-2"></i>Details
+                                </a>
+
+                                @if (!soldOut)
+                                {
+                                    <a class="btn btn-primary flex-grow-1" asp-controller="Reservations" asp-action="Reserve" asp-route-eventId="@e.Id">
+                                        <i class="bi bi-ticket-perforated me-2"></i>Reserve
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary flex-grow-1" disabled>
+                                        <i class="bi bi-x-circle me-2"></i>Sold Out
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+<style>
+    /* Event Cards (User View) */
+    .event-card {
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(217, 70, 239, 0.2);
+        }
+
+    .event-image-container {
+        overflow: hidden;
+        height: 280px;
+    }
+
+    .event-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .event-card:hover .event-image {
+        transform: scale(1.1);
+    }
+
+    .price-badge {
+        background: #f97316;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1.25rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .badge-club {
+        background: #d946ef;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-concert {
+        background: #ec4899;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-bar {
+        background: #8b5cf6;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-venue {
+        background: #6b7280;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-box {
+        background: rgba(217, 70, 239, 0.05);
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+        .info-box:hover {
+            background: rgba(217, 70, 239, 0.1);
+            border-color: rgba(217, 70, 239, 0.3);
+        }
+
+        .info-box i {
+            font-size: 1.25rem;
+        }
+
+    .performers-section {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .performer-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+        font-size: 0.9rem;
+    }
+
+        .performer-item i {
+            font-size: 1rem;
+        }
+
+    .performer-label {
+        color: #6b7280;
+    }
+
+    .performer-name {
+        font-weight: 600;
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .event-image-container {
+            height: 220px;
+        }
+    }
+</style>

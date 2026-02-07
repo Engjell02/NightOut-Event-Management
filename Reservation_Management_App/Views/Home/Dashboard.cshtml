@@ -1,0 +1,206 @@
+﻿@model Reservation_Management_App.Web.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="page-header mb-4">
+    <h1><i class="bi bi-grid-fill" style="color: #d946ef;"></i> Admin Dashboard</h1>
+    <form asp-action="ImportEvents" method="post" style="display: inline;">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-cloud-download"></i> Import Events from API
+        </button>
+    </form>
+    <p>Manage events, locations, performers, and reservations</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <!-- Total Events -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="color: #a0a0a0; font-size: 0.9rem; margin-bottom: 0.5rem;">Total Events</div>
+                    <div style="font-size: 2rem; font-weight: 700;">@Model.TotalEvents</div>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px; background: rgba(217, 70, 239, 0.15);">
+                    <i class="bi bi-calendar-event-fill" style="font-size: 1.75rem; color: #d946ef;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Locations -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="color: #a0a0a0; font-size: 0.9rem; margin-bottom: 0.5rem;">Locations</div>
+                    <div style="font-size: 2rem; font-weight: 700;">@Model.TotalLocations</div>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px; background: rgba(249, 115, 22, 0.15);">
+                    <i class="bi bi-geo-alt-fill" style="font-size: 1.75rem; color: #f97316;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performers -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="color: #a0a0a0; font-size: 0.9rem; margin-bottom: 0.5rem;">Performers</div>
+                    <div style="font-size: 2rem; font-weight: 700;">@Model.TotalPerformers</div>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.15);">
+                    <i class="bi bi-people-fill" style="font-size: 1.75rem; color: #10b981;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Reservations -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="color: #a0a0a0; font-size: 0.9rem; margin-bottom: 0.5rem;">Pending Reservations</div>
+                    <div style="font-size: 2rem; font-weight: 700;">@Model.PendingReservations</div>
+                </div>
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px; background: rgba(234, 179, 8, 0.15);">
+                    <i class="bi bi-hourglass-split" style="font-size: 1.75rem; color: #eab308;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Second Row: Overview Cards -->
+<div class="row g-4 mb-4">
+    <!-- Reservation Overview -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-graph-up" style="color: #10b981; font-size: 1.25rem; margin-right: 0.5rem;"></i>
+                    <h5 class="mb-0">Reservation Overview</h5>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: #a0a0a0;">Approved</span>
+                        <span style="color: #10b981; font-weight: 600;">@Model.ApprovedReservations</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: #a0a0a0;">Pending</span>
+                        <span style="color: #eab308; font-weight: 600;">@Model.PendingReservations</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span style="color: #a0a0a0;">Total</span>
+                        <span style="font-weight: 600;">@Model.TotalReservations</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue (Approved) -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-currency-dollar" style="color: #f97316; font-size: 1.25rem; margin-right: 0.5rem;"></i>
+                    <h5 class="mb-0">Revenue (Approved)</h5>
+                </div>
+
+                <div style="font-size: 2.5rem; font-weight: 700; color: #f97316;">
+                    @Model.ApprovedRevenue.ToString("N0") ден
+                </div>
+                <p style="color: #a0a0a0; font-size: 0.9rem; margin-bottom: 0;">
+                    From @Model.ApprovedReservations confirmed reservations
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="mb-4">Quick Actions</h5>
+
+        <div class="row g-3">
+            <!-- Create Event -->
+            <div class="col-md-3">
+                <a asp-controller="Events" asp-action="Create"
+                   class="d-block text-center p-4 rounded-3 text-decoration-none"
+                   style="background: rgba(217, 70, 239, 0.1); border: 1px solid rgba(217, 70, 239, 0.2); transition: all 0.3s;">
+                    <i class="bi bi-calendar-plus" style="font-size: 2.5rem; color: #d946ef; display: block; margin-bottom: 1rem;"></i>
+                    <span style="font-weight: 600; color: white;">Create Event</span>
+                </a>
+            </div>
+
+            <!-- Add Location -->
+            <div class="col-md-3">
+                <a asp-controller="Locations" asp-action="Create"
+                   class="d-block text-center p-4 rounded-3 text-decoration-none"
+                   style="background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2); transition: all 0.3s;">
+                    <i class="bi bi-geo-alt-fill" style="font-size: 2.5rem; color: #f97316; display: block; margin-bottom: 1rem;"></i>
+                    <span style="font-weight: 600; color: white;">Add Location</span>
+                </a>
+            </div>
+
+            <!-- Add Performer -->
+            <div class="col-md-3">
+                <a asp-controller="Performers" asp-action="Create"
+                   class="d-block text-center p-4 rounded-3 text-decoration-none"
+                   style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); transition: all 0.3s;">
+                    <i class="bi bi-person-plus-fill" style="font-size: 2.5rem; color: #10b981; display: block; margin-bottom: 1rem;"></i>
+                    <span style="font-weight: 600; color: white;">Add Performer</span>
+                </a>
+            </div>
+
+            <!-- Manage Reservations -->
+            <div class="col-md-3">
+                <a asp-controller="Reservations" asp-action="Index"
+                   class="d-block text-center p-4 rounded-3 text-decoration-none"
+                   style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); transition: all 0.3s;">
+                    <i class="bi bi-list-check" style="font-size: 2.5rem; color: #eab308; display: block; margin-bottom: 1rem;"></i>
+                    <span style="font-weight: 600; color: white;">Manage Reservations</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    [style*="background: rgba(217, 70, 239"]:hover {
+        background: rgba(217, 70, 239, 0.2) !important;
+        transform: translateY(-3px);
+    }
+
+    [style*="background: rgba(249, 115, 22"]:hover {
+        background: rgba(249, 115, 22, 0.2) !important;
+        transform: translateY(-3px);
+    }
+
+    [style*="background: rgba(16, 185, 129"]:hover {
+        background: rgba(16, 185, 129, 0.2) !important;
+        transform: translateY(-3px);
+    }
+
+    [style*="background: rgba(234, 179, 8"]:hover {
+        background: rgba(234, 179, 8, 0.2) !important;
+        transform: translateY(-3px);
+    }
+</style>

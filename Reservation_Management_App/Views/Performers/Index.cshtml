@@ -1,0 +1,146 @@
+﻿@model IEnumerable<Reservation_Management_App.Domain.DomainModels.Performer>
+@{
+    ViewData["Title"] = "Performers";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>
+                <i class="bi bi-people" style="color: #10b981;"></i> Performers
+            </h1>
+            <p style="color: #a0a0a0;">Manage DJs, bands, and singers</p>
+        </div>
+        <a class="btn btn-primary" asp-action="Create">
+            <i class="bi bi-plus-lg me-2"></i>Add Performer
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-4">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>No performers yet. Add one to get started.
+    </div>
+}
+else
+{
+    <!-- Performers Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Performer</th>
+                        <th>Type</th>
+                        <th>Booking Fee</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var performer in Model)
+                    {
+                        var img = string.IsNullOrWhiteSpace(performer.ImageUrl)
+                        ? "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&h=100&fit=crop"
+                        : performer.ImageUrl;
+
+                        // Determine type and badge class
+                        var performerType = performer.Type?.Trim() ?? "Artist";
+                        var badgeClass = performerType.ToLower() == "dj" ? "badge-dj" :
+                        performerType.ToLower() == "band" ? "badge-band" :
+                        performerType.ToLower() == "singer" ? "badge-singer" : "badge-artist";
+
+                        // Generate booking fee (you can add a real BookingFee field later)
+                        var bookingFee = performerType.ToLower() == "dj" ? "500" :
+                        performerType.ToLower() == "band" ? "1200" :
+                        performerType.ToLower() == "singer" ? "800" : "600";
+
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@img" alt="@performer.StageName"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;" />
+                                    <div>
+                                        <div style="font-weight: 600; color: white;">
+                                            @performer.StageName
+                                            @if (performer.ImportedFromApi)
+                                            {
+                                                <span class="badge ms-2" style="background: rgba(99, 102, 241, 0.2); color: #6366f1; font-size: 0.7rem; padding: 0.3rem 0.6rem;">
+                                                    <i class="bi bi-cloud-download me-1"></i>From API
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <span class="badge @badgeClass">@performerType</span>
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <span style="color: #f97316; font-weight: 700;">@bookingFee ден</span>
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Edit" asp-route-id="@performer.Id" class="btn btn-sm btn-link p-1" style="color: #d946ef;">
+                                        <i class="bi bi-pencil" style="font-size: 1.1rem;"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@performer.Id" class="btn btn-sm btn-link p-1" style="color: #ef4444;">
+                                        <i class="bi bi-trash" style="font-size: 1.1rem;"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<style>
+    .badge-dj {
+        background: #8b5cf6;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .badge-band {
+        background: #f97316;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .badge-singer {
+        background: #10b981;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .badg

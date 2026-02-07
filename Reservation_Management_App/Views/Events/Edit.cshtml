@@ -1,0 +1,85 @@
+﻿@model Reservation_Management_App.Domain.DomainModels.Event
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Event</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDateTime" class="control-label"></label>
+                <input asp-for="StartDateTime" class="form-control" />
+                <span asp-validation-for="StartDateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PricePerPerson" class="control-label"></label>
+                <input asp-for="PricePerPerson" class="form-control" />
+                <span asp-validation-for="PricePerPerson" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AvailableSpots" class="control-label"></label>
+                <input asp-for="AvailableSpots" class="form-control" />
+                <span asp-validation-for="AvailableSpots" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PosterImageUrl" class="control-label"></label>
+                <input asp-for="PosterImageUrl" class="form-control" />
+                <span asp-validation-for="PosterImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExternalEventCode" class="control-label"></label>
+                <input asp-for="ExternalEventCode" class="form-control" />
+                <span asp-validation-for="ExternalEventCode" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    Optional. Link to external API data (e.g., EVENT001, EVENT002)
+                </small>
+            </div>
+            <div class="form-group">
+                <label asp-for="LocationId" class="control-label"></label>
+                <select asp-for="LocationId" class="form-control" asp-items="ViewBag.LocationId"></select>
+                <span asp-validation-for="LocationId" class="text-danger"></span>
+            </div>
+            <!-- Main Act Dropdown -->
+            <div class="form-group mb-3">
+                <label asp-for="MainActId" class="control-label">Main Act (Band/Singer)</label>
+                <select asp-for="MainActId" class="form-select" asp-items="ViewBag.MainActId">
+                    <option value="">-- Select band or singer --</option>
+                </select>
+                <span asp-validation-for="MainActId" class="text-danger"></span>
+            </div>
+
+            <!-- DJ Dropdown -->
+            <div class="form-group mb-0">
+                <label asp-for="DjId" class="control-label">DJ</label>
+                <select asp-for="DjId" class="form-select" asp-items="ViewBag.DjId">
+                    <option value="">-- Select DJ --</option>
+                </select>
+                <span asp-validation-for="DjId" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
